@@ -1,10 +1,15 @@
 import express from "express"
-import { register,login,logOut } from "../controller/authController.js";
+import { adminLogin, googleLogin, login, logOut, registration } from "../controller/authController.js"
 
-const authRoutes = express.Router();
+const authRoutes = express.Router()
 
-authRoutes.post("/registration",register);
-authRoutes.post("/login",login);
-authRoutes.post("/logout",logOut);
+authRoutes.post("/registration",registration)
+authRoutes.post("/login",login)
+authRoutes.get("/logout",logOut)
+authRoutes.post("/googlelogin",googleLogin)
+authRoutes.post("/adminlogin",adminLogin)
 
-export default authRoutes;
+
+
+
+export default authRoutes
