@@ -1,6 +1,7 @@
-# 🛒 eCart - Full-Stack MERN E-Commerce Platform
+# 🛒 eCart - AI-Powered Full-Stack MERN E-Commerce Platform
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Anthropic Claude AI](https://img.shields.io/badge/AI_Assistant-Claude_3.5_Sonnet-orange.svg)](https://www.anthropic.com/)
 [![React](https://img.shields.io/badge/React-19.x-blue.svg)](https://react.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-v18+-339933.svg)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-5.x-lightgrey.svg)](https://expressjs.com/)
@@ -9,7 +10,7 @@
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-Media-blue.svg)](https://cloudinary.com/)
 [![Razorpay](https://img.shields.io/badge/Razorpay-Payment-0C2340.svg)](https://razorpay.com/)
 
-An end-to-end, full-stack E-Commerce platform built with modern web technologies, featuring a responsive customer storefront, a dedicated admin management portal, secure JWT & Google OAuth authentication, Cloudinary media storage, and Razorpay payment gateway integration.
+An end-to-end, full-stack E-Commerce platform built with modern web technologies, featuring a luxury customer storefront, an intelligent **Claude 3.5 AI Shopping Stylist** (multimodal Voice & Chat Assistant), an executive **Admin Analytics Dashboard**, secure JWT & Google OAuth authentication, Cloudinary media storage, and Razorpay payment gateway integration.
 
 **Author:** **[Siddharth Saurabh](https://github.com/Siddharth-Saurabh)**
 
@@ -17,56 +18,52 @@ An end-to-end, full-stack E-Commerce platform built with modern web technologies
 
 ## 📑 Table of Contents
 
+- [Key Highlights & Upgrades](#-key-highlights--upgrades)
 - [Features](#-features)
-  - [Customer Storefront](#-customer-storefront)
-  - [Admin Management Portal](#-admin-management-portal)
-  - [Backend & Security](#-backend--security)
-- [Architecture & Tech Stack](#-architecture--tech-stack)
+  - [🤖 Claude AI Shopping Stylist (New)](#-claude-ai-shopping-stylist-new)
+  - [🛍️ Customer Storefront](#-customer-storefront)
+  - [🛡️ Executive Admin Management Portal](#-executive-admin-management-portal)
+  - [🔒 Backend & Security Architecture](#-backend--security-architecture)
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
-  - [Prerequisites](#prerequisites)
   - [1. Backend Setup](#1-backend-setup)
   - [2. Frontend Setup (Storefront)](#2-frontend-setup-storefront)
   - [3. Admin Setup (Portal)](#3-admin-setup-portal)
 - [Environment Variables](#-environment-variables)
 - [API Endpoints](#-api-endpoints)
-- [Screenshots & UI Showcase](#-screenshots--ui-showcase)
 - [License](#-license)
+
+---
+
+## 🌟 Key Highlights & Upgrades
+
+- 🤖 **Intelligent Claude 3.5 AI Assistant**: Real-time conversational fashion stylist with full catalog context injection, voice command recognition, and natural speech synthesis.
+- 🎨 **Luxury Glassmorphism UI**: Completely reimagined dark aesthetic with fluid animations, glowing accents, and responsive layouts across mobile, tablet, and desktop.
+- 📊 **Executive Admin KPI Analytics**: Dynamic calculation of Total Revenue, Total Processed Orders, Active Inventory, and Fulfilled Deliveries.
+- 💳 **Seamless Razorpay & COD Checkout**: End-to-end payment gateway with signature verification and order tracking.
 
 ---
 
 ## ✨ Features
 
+### 🤖 Claude AI Shopping Stylist (New)
+- **Live Catalog Awareness**: Injects live product inventory into Claude's context to recommend real items, sizes, and matching outfits.
+- **Multimodal Voice & Chat UI**: Floating glowing orb with SpeechRecognition for hands-free voice search/navigation, and interactive conversational drawer.
+- **Natural Voice Synthesis**: Speaks answers and styling suggestions aloud with mute toggle.
+- **Instant Shortcuts**: One-click prompt chips for trending bestsellers, men's/women's fashion, return policies, and instant cart/order navigation.
+
 ### 🛍️ Customer Storefront
-- **Dynamic Catalog & Collections**: Browse collections with real-time text search, category filters (Men, Women, Kids), subcategory filters (Topwear, Bottomwear, Winterwear), and price sorting.
-- **Product Details**: Multi-angle image preview galleries, size selector, pricing, descriptions, and related product carousels.
-- **Interactive Cart**: Synchronized cart state across sessions, item quantity modifications, real-time total and delivery fee calculations.
-- **Seamless Checkout**: Support for multiple checkout options including **Cash on Delivery (COD)** and **Razorpay Online Payments**.
-- **User Orders Dashboard**: View personal order history, order items, timestamps, payment status, and order fulfillment progression.
-- **Modern User Experience**: Smooth animations, toast notifications, responsive mobile-first navigation, and Google OAuth 2.0 integration.
+- **Dynamic Catalog & Collections**: Real-time search, category filters (Men, Women, Kids), subcategory filters (Topwear, Bottomwear, Winterwear), and price sorting.
+- **Product Details & Gallery**: Multi-angle image zoom galleries, size selectors, live stock badges, and related product recommendations.
+- **Interactive Cart**: Synchronized cart state across sessions, quantity steppers, item deletion, and live totals.
+- **Order Tracking**: Order lifecycle updates (*Order Placed*, *Packing*, *Shipped*, *Out for Delivery*, *Delivered*).
+- **Authentication**: JWT token-based authentication with secure `httpOnly` cookies and Google OAuth 2.0.
 
-### 🛡️ Admin Management Portal
-- **Dashboard Overview**: Centralized control panel for catalog and order operations.
-- **Product Management**: Upload new products with multi-image Cloudinary uploads, sizing options, categories, best-seller toggles, and inventory details.
-- **Product Catalog Management**: Instantly inspect, list, and delete inventory items.
-- **Order Lifecycle Management**: Real-time order tracking, address verification, payment method validation, and status updates (*Order Placed*, *Packing*, *Shipped*, *Out for Delivery*, *Delivered*).
-
-### 🔒 Backend & Security
-- **RESTful API**: Clean controller-route-middleware architecture powered by Express 5.
-- **Authentication**: JWT token-based authentication with secure `httpOnly` cookies and role-based route guards (`isAuth` and `adminAuth`).
-- **Media Optimization**: Integrated Cloudinary pipeline via Multer with automatic local cleanup.
-- **Payment Verification**: Cryptographically secure Razorpay signature verification and order status management.
-
----
-
-## 🛠️ Architecture & Tech Stack
-
-| Domain | Technologies Used |
-|---|---|
-| **Frontend Storefront** | React 19, Vite, Tailwind CSS, React Router DOM, React Icons, React Toastify, Google OAuth |
-| **Admin Dashboard** | React 19, Vite, Tailwind CSS, React Router DOM, Axios, React Toastify |
-| **Backend API** | Node.js, Express 5, Mongoose (MongoDB ODM), Cookie Parser, CORS, Dotenv, Multer, Validator |
-| **Cloud Services** | MongoDB Atlas, Cloudinary (CDN & Image Storage), Razorpay (Payment Gateway) |
+### 🛡️ Executive Admin Management Portal
+- **Dashboard Overview**: Metric cards showing real-time gross revenue, order volume, catalog count, and fulfillment stats.
+- **Product Management**: Upload new products with multi-image previews, size variation chips, category selectors, and bestseller flags.
+- **Catalog Management**: Real-time product inventory list with instant deletion and editing.
+- **Order Pipeline**: Track customer shipping addresses, payment methods, and update order fulfillment statuses.
 
 ---
 
@@ -76,18 +73,18 @@ An end-to-end, full-stack E-Commerce platform built with modern web technologies
 eCart/
 ├── backend/                  # Express REST API Server
 │   ├── config/               # DB, Token, Cloudinary configurations
-│   ├── controller/           # Auth, User, Product, Cart, Order controllers
+│   ├── controller/           # AI (Claude), Auth, User, Product, Cart, Order controllers
 │   ├── middleware/           # isAuth, adminAuth, multer upload middleware
 │   ├── model/                # Mongoose Models (User, Product, Order)
-│   ├── routes/               # API route definitions
+│   ├── routes/               # API route definitions (/api/ai, /api/auth, /api/product, etc.)
 │   ├── .env.example          # Environment variable template
 │   ├── index.js              # Server entry point
 │   └── package.json
 │
-├── frontend/                 # Client Storefront (React + Vite)
+├── frontend/                 # Client Storefront (React 19 + Vite)
 │   ├── src/
 │   │   ├── assets/           # Logos, banners, audio, icons
-│   │   ├── component/        # Header, Footer, Hero, Card, Carousel, Policies
+│   │   ├── component/        # Claude AI Widget, Nav, Footer, Hero, Card, Policies...
 │   │   ├── context/          # ShopContext, AuthContext, UserContext
 │   │   ├── pages/            # Home, Collections, Cart, PlaceOrder, Order, Login...
 │   │   ├── App.jsx           # Main Router and Layout
@@ -95,11 +92,11 @@ eCart/
 │   ├── .env.example
 │   └── package.json
 │
-├── admin/                    # Admin Dashboard (React + Vite)
+├── admin/                    # Admin Dashboard (React 19 + Vite)
 │   ├── src/
 │   │   ├── component/        # Navbar, Sidebar, Layout components
 │   │   ├── context/          # AdminContext, AuthContext
-│   │   ├── pages/            # Add Product, List Products, Orders, Login
+│   │   ├── pages/            # KPI Dashboard, Add Product, Catalog Lists, Orders, Login
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   ├── .env.example
@@ -114,14 +111,6 @@ eCart/
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [MongoDB](https://www.mongodb.com/) (Local instance or MongoDB Atlas account)
-- [Cloudinary Account](https://cloudinary.com/) (For product image uploads)
-- [Razorpay Account](https://razorpay.com/) (For online payment processing)
-
----
-
 ### 1. Backend Setup
 
 ```bash
@@ -130,13 +119,13 @@ npm install
 cp .env.example .env
 ```
 
-Configure your `.env` with your MongoDB URI, JWT Secret, Admin credentials, Cloudinary keys, and Razorpay keys.
+Configure your `.env` variables with your MongoDB URI, JWT Secret, Admin credentials, Cloudinary keys, Razorpay keys, and Anthropic API key.
 
 Start the backend development server:
 ```bash
 npm run dev
 ```
-> Server runs on `http://localhost:8000` by default.
+> Server runs on `http://localhost:8000`.
 
 ---
 
@@ -169,7 +158,7 @@ npm run dev
 | Variable | Description |
 |---|---|
 | `PORT` | Backend server port (Default: `8000`) |
-| `MONGODB_URL` | MongoDB connection connection string |
+| `MONGODB_URL` | MongoDB connection string |
 | `JWT_SECRET` | Secret key for JWT generation |
 | `ADMIN_EMAIL` | Admin login email address |
 | `ADMIN_PASSWORD` | Admin login password |
@@ -178,10 +167,14 @@ npm run dev
 | `CLOUDINARY_API_SECRET` | Cloudinary API Secret |
 | `RAZORPAY_KEY_ID` | Razorpay Key ID |
 | `RAZORPAY_KEY_SECRET` | Razorpay Key Secret |
+| `ANTHROPIC_API_KEY` | Anthropic Claude AI API Key |
 
 ---
 
 ## 📡 API Endpoints
+
+### 🤖 Claude AI (`/api/ai`)
+- `POST /api/ai/chat` - Conversational shopping assistant with catalog context injection
 
 ### 🔑 Authentication & Users (`/api/auth`, `/api/user`)
 - `POST /api/auth/registration` - Register a new customer
@@ -193,10 +186,9 @@ npm run dev
 - `GET  /api/user/getadmin` - Validate authenticated admin status
 
 ### 📦 Products (`/api/product`)
-- `POST /api/product/add` - Add new product with image uploads (*Admin*)
+- `POST /api/product/addproduct` - Add new product with image uploads (*Admin*)
 - `GET  /api/product/list` - Fetch all active products
-- `POST /api/product/remove` - Delete product by ID (*Admin*)
-- `POST /api/product/single` - Fetch single product details
+- `POST /api/product/remove/:id` - Delete product by ID (*Admin*)
 
 ### 🛒 Cart (`/api/cart`)
 - `POST /api/cart/add` - Add item to cart
@@ -204,11 +196,11 @@ npm run dev
 - `POST /api/cart/get` - Retrieve authenticated user's cart
 
 ### 💳 Orders & Payments (`/api/order`)
-- `POST /api/order/place` - Create Cash on Delivery order
+- `POST /api/order/placeorder` - Create Cash on Delivery order
 - `POST /api/order/razorpay` - Initiate Razorpay order transaction
 - `POST /api/order/verifyrazorpay` - Verify Razorpay payment signature
-- `GET  /api/order/userorder` - Fetch user order history
-- `GET  /api/order/list` - Fetch all platform orders (*Admin*)
+- `POST /api/order/userorder` - Fetch user order history
+- `POST /api/order/list` - Fetch all platform orders (*Admin*)
 - `POST /api/order/status` - Update order tracking status (*Admin*)
 
 ---
