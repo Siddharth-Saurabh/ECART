@@ -1,85 +1,121 @@
-import React, { useContext, useEffect, useState } from 'react'
-import Nav from '../component/Nav'
-import Sidebar from '../component/Sidebar'
-import { authDataContext } from '../context/AuthContext'
-import axios from 'axios'
+import React, { useContext, useEffect, useState } from 'react';
+import Nav from '../component/Nav';
+import Sidebar from '../component/Sidebar';
+import { authDataContext } from '../context/AuthContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { RiDeleteBin6Line, RiFileList3Line } from 'react-icons/ri';
 
 function Lists() {
-  let [list ,setList] = useState([])
-  let {serverUrl} = useContext(authDataContext)
-
+  const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { serverUrl } = useContext(authDataContext);
 
   const fetchList = async () => {
     try {
-      let result = await axios.get(serverUrl + "/api/product/list" )
-      setList(result.data)
-      console.log(result.data)
+      const result = await axios.get(`${serverUrl}/api/product/list`);
+      setList(result.data || []);
     } catch (error) {
-      console.log(error)
+      console.error(error);
+      toast.error("Failed to load catalog products");
+    } finally {
+      setLoading(false);
     }
-    
-  }
+  };
 
-  const removeList = async (id) => {
+  const removeList = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
 
     try {
-      let result = await axios.post(`${serverUrl}/api/product/remove/${id}`,{},{withCredentials:true})
-
-      if(result.data){
-        fetchList()
-      }
-      else{
-        console.log("Failed to remove Product")
+      const result = await axios.post(`${serverUrl}/api/product/remove/${id}`, {}, { withCredentials: true });
+      if (result.data) {
+        toast.info("Product removed from catalog");
+        fetchList();
+      } else {
+        toast.error("Failed to remove product");
       }
     } catch (error) {
-      console.log(error)
+      console.error(error);
+      toast.error("Error deleting product");
     }
-    
-  }
+  };
 
-  useEffect(()=>{
-   fetchList()
-  },[])
+  useEffect(() => {
+    fetchList();
+  }, []);
+
   return (
-    <div className='w-[100vw] min-h-[100vh] bg-gradient-to-l from-[#141414] to-[#0c2025] text-[white]'>
-      <Nav/>
-      <div className='w-[100%] h-[100%] flex items-center justify-start'>
-        <Sidebar/>
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <Nav />
+      <Sidebar />
 
-        <div className='w-[82%] h-[100%] lg:ml-[320px] md:ml-[230px] mt-[70px] flex flex-col gap-[30px] overflow-x-hidden py-[50px] ml-[100px]'>
-          <div className='w-[400px] h-[50px] text-[28px] md:text-[40px] mb-[20px] text-white'>All Listed Products</div>
-
-
-          {
-            list?.length > 0 ? (
-              list.map((item,index)=>(
-                <div className='w-[90%] md:h-[120px] h-[90px] bg-slate-600 rounded-xl flex items-center justify-start gap-[5px] md:gap-[30px] p-[10px] md:px-[30px]' key={index}>
-                  <img src={item.image1} className='w-[30%] md:w-[120px] h-[90%] rounded-lg' alt="" />
-                  <div className='w-[90%] h-[80%] flex flex-col items-start justify-center gap-[2px]'>
-
-                    <div className='w-[100%] md:text-[20px] text-[15px] text-[#bef0f3]'>{item.name}</div>
-                     <div className='md:text-[17px] text-[15px] text-[#bef3da]'>{item.category}</div>
-                  <div className='md:text-[17px] text-[15px] text-[#bef3da]'>₹{item.price}</div>
-
-                  </div>
-                  <div className='w-[10%] h-[100%] bg-transparent flex items-center justify-center'>
-                    <span className='w-[35px] h-[30%] flex items-center justify-center rounded-md md:hover:bg-red-300 md:hover:text-black cursor-pointer' onClick={()=>removeList(item._id)}>X</span>
-                  </div>
-                 
-
-                </div>
-              ))
-            )
-
-            : (
-              <div className='text-white text-lg'>No products available.</div>
-            )
-          }
+      <main className="pl-16 sm:pl-64 pt-[70px] p-6 sm:p-10 max-w-6xl mx-auto">
+        
+        <div className="flex items-center justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Active Product Catalog</h2>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+              Currently managing <strong className="text-cyan-400">{list.length}</strong> items in inventory.
+            </p>
+          </div>
         </div>
 
-      </div>
+        {list.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4">
+            {list.map((item) => (
+              <div
+                key={item._id}
+                className="p-4 sm:p-5 rounded-2xl bg-slate-900/70 backdrop-blur-xl border border-slate-800 hover:border-slate-700 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+              >
+                <div className="flex items-center gap-4">
+                  <img
+                    src={item.image1}
+                    alt={item.name}
+                    className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded-xl bg-slate-950 border border-slate-800 shrink-0"
+                  />
+                  <div className="space-y-1">
+                    <h4 className="text-sm sm:text-base font-bold text-white line-clamp-1">{item.name}</h4>
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                      <span className="font-bold text-cyan-400 text-sm">₹{item.price}</span>
+                      <span>•</span>
+                      <span className="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-[11px] font-semibold text-slate-300">
+                        {item.category} / {item.subCategory}
+                      </span>
+                      {item.bestseller && (
+                        <span className="px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[11px] font-bold">
+                          Bestseller
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800">
+                  <span className="text-xs text-slate-400">
+                    Sizes: <strong className="text-slate-200">{item.sizes?.join(', ')}</strong>
+                  </span>
+                  <button
+                    onClick={() => removeList(item._id, item.name)}
+                    className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all ml-4"
+                    title="Delete product"
+                  >
+                    <RiDeleteBin6Line className="text-lg" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-20 text-center bg-slate-900/40 rounded-3xl border border-slate-800 p-8">
+            <RiFileList3Line className="text-4xl text-slate-500 mx-auto mb-3" />
+            <p className="text-base font-bold text-white">No products currently listed</p>
+            <p className="text-xs text-slate-400 mt-1">Click "Add Product" in the sidebar to publish items.</p>
+          </div>
+        )}
+
+      </main>
     </div>
-  )
+  );
 }
 
-export default Lists
+export default Lists;

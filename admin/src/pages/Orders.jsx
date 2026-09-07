@@ -1,100 +1,156 @@
-import React from 'react'
-import Nav from '../component/Nav'
-import Sidebar from '../component/Sidebar'
-import { useState } from 'react'
-import { useContext } from 'react'
-import { authDataContext } from '../context/AuthContext'
-import axios from 'axios'
-import { useEffect } from 'react'
-import { SiEbox } from "react-icons/si";
+import React, { useState, useContext, useEffect } from 'react';
+import Nav from '../component/Nav';
+import Sidebar from '../component/Sidebar';
+import { authDataContext } from '../context/AuthContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { RiShoppingBag3Line, RiTruckLine, RiMapPinLine, RiPhoneLine } from 'react-icons/ri';
 
 function Orders() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { serverUrl } = useContext(authDataContext);
 
-  let [orders,setOrders] = useState([])
-  let {serverUrl} = useContext(authDataContext)
-
-    const fetchAllOrders =async () => {
+  const fetchAllOrders = async () => {
     try {
-      const result = await axios.post(serverUrl + '/api/order/list' , {} ,{withCredentials:true})
-      setOrders(result.data.reverse())
-      
+      const result = await axios.post(`${serverUrl}/api/order/list`, {}, { withCredentials: true });
+      setOrders((result.data || []).reverse());
     } catch (error) {
-      console.log(error)
+      console.error(error);
+      toast.error("Failed to load customer orders");
+    } finally {
+      setLoading(false);
     }
-    
-  }
-   const statusHandler = async (e , orderId) => {
-         try {
-          const result = await axios.post(serverUrl + '/api/order/status' , {orderId,status:e.target.value},{withCredentials:true})
-          if(result.data){
-            await fetchAllOrders()
-          }
-         } catch (error) {
-          console.log(error)
-          
-         }
-  }
-  useEffect(()=>{
-    fetchAllOrders()
-  },[])
+  };
+
+  const statusHandler = async (newStatus, orderId) => {
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/order/status`,
+        { orderId, status: newStatus },
+        { withCredentials: true }
+      );
+      if (result.data) {
+        toast.success(`Order status updated to "${newStatus}"`);
+        fetchAllOrders();
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Could not update order status");
+    }
+  };
+
+  useEffect(() => {
+    fetchAllOrders();
+  }, []);
+
   return (
-    <div className='w-[99vw] min-h-[100vh] bg-gradient-to-l from-[#141414] to-[#0c2025] text-[white]'>
-      
-      <Nav/>
-      <div className='w-[100%] h-[100%] flex items-center lg:justify-start justify-center'>
-        <Sidebar/>
-        <div className='lg:w-[85%] md:w-[70%] h-[100%] lg:ml-[310px] md:ml-[250px] mt-[70px] flex flex-col gap-[30px] overflow-x-hidden py-[50px] ml-[100px]'>
-          <div className='w-[400px] h-[50px] text-[28px] md:text-[40px] mb-[20px] text-white'>All Orders List</div>
-          {
-           orders.map((order,index)=>(
-            <div key={index} className='w-[90%] h-[40%] bg-slate-600 rounded-xl flex lg:items-center items-start justify-between  flex-col lg:flex-row p-[10px] md:px-[20px]  gap-[20px]'>
-            <SiEbox  className='w-[60px] h-[60px] text-[black] p-[5px] rounded-lg bg-[white]'/>
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <Nav />
+      <Sidebar />
 
-            <div>
-              <div className='flex items-start justify-center flex-col gap-[5px] text-[16px] text-[#56dbfc]'>
-                {
-                  order.items.map((item,index)=>{
-                    if(index === order.items.length - 1){
-                       return <p key={index}>{item.name.toUpperCase()}  *  {item.quantity} <span>{item.size}</span></p>
-
-                    }else{
-                       return <p key={index}>{item.name.toUpperCase()}  *  {item.quantity} <span>{item.size}</span>,</p>
-
-                    }
-                  })
-                }
-              </div>
-
-              <div className='text-[15px] text-green-100'>
-                  <p>{order.address.firstName+" "+ order.address.lastName}</p>
-                  <p>{order.address.street + ", "}</p>
-                  <p>{order.address.city + ", " + order.address.state + ", " + order.address.country + ", " + order.address.pinCode}</p>
-                  <p>{order.address.phone}</p>
-                </div>
-            </div>
-            <div className='text-[15px] text-green-100'>
-                  <p>Items : {order.items.length}</p>
-                  <p>Method : {order.paymentMethod}</p>
-                  <p>Payment : {order.payment ? 'Done' : 'Pending'}</p>
-                  <p>Date : {new Date(order.date).toLocaleDateString()}</p>
-                   <p className='text-[20px] text-[white]'> ₹ {order.amount}</p>
-                </div>
-                <select  value={order.status} className='px-[5px] py-[10px] bg-slate-500 rounded-lg border-[1px] border-[#96eef3]' onChange={(e)=>statusHandler(e,order._id)} >
-                  <option value="Order Placed">Order Placed</option>
-                  <option value="Packing">Packing</option>
-                  <option value="Shipped">Shipped</option>
-                  <option value="Out for delivery">Out for delivery</option>
-                  <option value="Delivered">Delivered</option>
-                </select>
-            </div>
-            
-           ))
-
-          }
+      <main className="pl-16 sm:pl-64 pt-[70px] p-6 sm:p-10 max-w-6xl mx-auto">
+        
+        <div className="mb-8">
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Customer Order Pipeline</h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Review buyer details, ordered items, payment verification, and dispatch status.
+          </p>
         </div>
-      </div>
+
+        {orders.length > 0 ? (
+          <div className="space-y-5">
+            {orders.map((order) => (
+              <div
+                key={order._id}
+                className="p-6 rounded-3xl bg-slate-900/70 backdrop-blur-xl border border-slate-800 hover:border-slate-700 transition-all flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
+              >
+                {/* Left: Items & Buyer */}
+                <div className="space-y-3 flex-1">
+                  
+                  {/* Items list */}
+                  <div className="space-y-1">
+                    {order.items?.map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm text-slate-200">
+                        <span className="font-bold text-white">{item.name}</span>
+                        <span className="text-xs text-cyan-400 font-semibold">× {item.quantity}</span>
+                        <span className="text-xs bg-slate-800 px-1.5 py-0.5 rounded text-slate-300 font-mono">
+                          [{item.size}]
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Customer Info */}
+                  <div className="text-xs text-slate-400 space-y-1 pt-2 border-t border-slate-800/80">
+                    <p className="font-bold text-slate-200 flex items-center gap-1.5">
+                      <span>{order.address?.firstName} {order.address?.lastName}</span>
+                      <span className="text-[11px] text-slate-500 font-normal">({order.address?.email})</span>
+                    </p>
+                    <p className="flex items-center gap-1 text-slate-400">
+                      <RiMapPinLine className="text-cyan-400 shrink-0" />
+                      <span>{order.address?.street}, {order.address?.city}, {order.address?.state} - {order.address?.pinCode}</span>
+                    </p>
+                    <p className="flex items-center gap-1 text-slate-400">
+                      <RiPhoneLine className="text-cyan-400 shrink-0" />
+                      <span>{order.address?.phone}</span>
+                    </p>
+                  </div>
+
+                </div>
+
+                {/* Middle: Payment Info */}
+                <div className="text-xs space-y-1 bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80 shrink-0 min-w-[200px]">
+                  <div className="flex justify-between text-slate-400">
+                    <span>Order Date:</span>
+                    <span className="text-white">{new Date(order.date).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Payment Method:</span>
+                    <span className="font-bold text-white uppercase">{order.paymentMethod}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Payment Status:</span>
+                    <span className={`font-bold ${order.payment ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      {order.payment ? 'Paid' : 'Pending (COD)'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-slate-300 pt-2 border-t border-slate-800">
+                    <span className="font-bold">Total Amount:</span>
+                    <span className="text-base font-extrabold text-cyan-400">₹{order.amount}</span>
+                  </div>
+                </div>
+
+                {/* Right: Status Dropdown */}
+                <div className="flex flex-col gap-2 shrink-0">
+                  <label className="text-[11px] font-bold uppercase text-slate-400">Shipment Status</label>
+                  <select
+                    value={order.status || 'Order Placed'}
+                    onChange={(e) => statusHandler(e.target.value, order._id)}
+                    className="px-4 py-2.5 bg-slate-950 border border-slate-700 text-slate-200 text-xs font-bold rounded-xl focus:outline-none focus:border-cyan-400 cursor-pointer"
+                  >
+                    <option value="Order Placed">Order Placed</option>
+                    <option value="Packing">Packing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Out for delivery">Out for Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
+                </div>
+
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-20 text-center bg-slate-900/40 rounded-3xl border border-slate-800 p-8">
+            <RiTruckLine className="text-4xl text-slate-500 mx-auto mb-3" />
+            <p className="text-base font-bold text-white">No customer orders placed yet</p>
+            <p className="text-xs text-slate-400 mt-1">Orders will appear here in real time when placed by users.</p>
+          </div>
+        )}
+
+      </main>
     </div>
-  )
+  );
 }
 
-export default Orders
+export default Orders;
