@@ -9,8 +9,9 @@ import userRoutes from './routes/userRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 import cartRoutes from './routes/cartRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
+import aiRoutes from './routes/aiRoutes.js'
 
-let port = process.env.PORT || 6000
+let port = process.env.PORT || 8000
 
 let app = express()
 
@@ -26,6 +27,7 @@ app.use("/api/user",userRoutes)
 app.use("/api/product",productRoutes)
 app.use("/api/cart",cartRoutes)
 app.use("/api/order",orderRoutes)
+app.use("/api/ai",aiRoutes)
 
 
 
