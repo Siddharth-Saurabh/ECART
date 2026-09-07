@@ -45,7 +45,7 @@ function Contact() {
                 </div>
                 <div className="flex items-center gap-3">
                   <RiPhoneLine className="text-cyan-400 text-lg shrink-0" />
-                  <span>+91 98765 43210 (Toll Free / WhatsApp)</span>
+                  <span>+91 00000 00000 00 (Support / Concierge)</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <RiMailLine className="text-cyan-400 text-lg shrink-0" />

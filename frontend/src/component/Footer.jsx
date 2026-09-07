@@ -55,7 +55,7 @@ function Footer() {
             <div className="space-y-2 text-xs sm:text-sm">
               <div className="flex items-center gap-2 text-slate-400">
                 <RiPhoneLine className="text-cyan-400" />
-                <span>+91 98765 43210</span>
+                <span>+91 00000 00000 00</span>
               </div>
               <div className="flex items-center gap-2 text-slate-400">
                 <RiMailLine className="text-cyan-400" />
