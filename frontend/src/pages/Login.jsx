@@ -1,96 +1,176 @@
-import React from 'react'
-import Logo from "../assets/logo.png"
-import { useNavigate } from 'react-router-dom'
-import google from '../assets/google.png'
-import { IoEyeOutline } from "react-icons/io5";
-import { IoEye } from "react-icons/io5";
-import { useState } from 'react';
-import { useContext } from 'react';
-import { authDataContext } from '../context/authContext';
+import React, { useState, useContext } from 'react';
+import Logo from "../assets/logo.png";
+import { useNavigate } from 'react-router-dom';
+import google from '../assets/google.png';
+import { IoEyeOutline, IoEye } from "react-icons/io5";
+import { authDataContext } from '../context/AuthContext';
+import { userDataContext } from '../context/UserContext';
 import axios from 'axios';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../utils/Firebase';
-import { userDataContext } from '../context/UserContext';
 import Loading from '../component/Loading';
+import { toast } from 'react-toastify';
+import { RiLockPasswordLine, RiMailLine } from 'react-icons/ri';
 
 function Login() {
-    let [show,setShow] = useState(false)
-        let [email,setEmail] = useState("")
-        let [password,setPassword] = useState("")
-        let {serverUrl} = useContext(authDataContext)
-        let {getCurrentUser} = useContext(userDataContext)
-        let [loading,setLoading] = useState(false)
+  const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { serverUrl } = useContext(authDataContext);
+  const { getCurrentUser } = useContext(userDataContext);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    let navigate = useNavigate()
-
-    const handleLogin = async (e) => {
-        setLoading(true)
-        e.preventDefault()
-        try {
-            let result = await axios.post(serverUrl + '/api/auth/login',{
-                email,password
-            },{withCredentials:true})
-            console.log(result.data)
-            setLoading(false)
-            getCurrentUser()
-            navigate("/")
-            toast.success("User Login Successful")
-            
-        } catch (error) {
-            console.log(error)
-            toast.error("User Login Failed")
-        }
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const result = await axios.post(
+        `${serverUrl}/api/auth/login`,
+        { email, password },
+        { withCredentials: true }
+      );
+      if (result.data) {
+        toast.success("👋 Welcome back!");
+        getCurrentUser();
+        navigate("/");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Invalid credentials");
+    } finally {
+      setLoading(false);
     }
-     const googlelogin = async () => {
-            try {
-                const response = await signInWithPopup(auth , provider)
-                let user = response.user
-                let name = user.displayName;
-                let email = user.email
-    
-                const result = await axios.post(serverUrl + "/api/auth/googlelogin" ,{name , email} , {withCredentials:true})
-                console.log(result.data)
-                getCurrentUser()
-            navigate("/")
-    
-            } catch (error) {
-                console.log(error)
-            }
-            
-        }
+  };
+
+  const googlelogin = async () => {
+    try {
+      const response = await signInWithPopup(auth, provider);
+      const user = response.user;
+      const name = user.displayName;
+      const userEmail = user.email;
+
+      await axios.post(
+        `${serverUrl}/api/auth/googlelogin`,
+        { name, email: userEmail },
+        { withCredentials: true }
+      );
+      toast.success("Signed in with Google!");
+      getCurrentUser();
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      toast.error("Google sign-in was interrupted");
+    }
+  };
+
   return (
-    <div className='w-[100vw] h-[100vh] bg-gradient-to-l from-[#141414] to-[#0c2025] text-[white] flex flex-col items-center justify-start'>
-    <div className='w-[100%] h-[80px] flex items-center justify-start px-[30px] gap-[10px] cursor-pointer' onClick={()=>navigate("/")}>
-    <img className='w-[40px]' src={Logo} alt="" />
-    <h1 className='text-[22px] font-sans '>OneCart</h1>
-    </div>
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      
+      {/* Background Glows */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-    <div className='w-[100%] h-[100px] flex items-center justify-center flex-col gap-[10px]'>
-        <span className='text-[25px] font-semibold'>Login Page</span>
-        <span className='text-[16px]'>Welcome to OneCart, Place your order</span>
+      {/* Brand Header */}
+      <div 
+        onClick={() => navigate("/")} 
+        className="flex items-center gap-2.5 cursor-pointer mb-6 group"
+      >
+        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 p-0.5 shadow-lg group-hover:scale-105 transition-transform">
+          <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+            <img src={Logo} alt="eCart" className="w-6 h-6 object-contain" />
+          </div>
+        </div>
+        <span className="text-2xl font-black text-white tracking-tight">
+          eCart<span className="text-cyan-400">.</span>
+        </span>
+      </div>
 
-    </div>
-    <div className='max-w-[600px] w-[90%] h-[500px] bg-[#00000025] border-[1px] border-[#96969635] backdrop:blur-2xl rounded-lg shadow-lg flex items-center justify-center '>
-        <form action="" onSubmit={handleLogin} className='w-[90%] h-[90%] flex flex-col items-center justify-start gap-[20px]'>
-            <div className='w-[90%] h-[50px] bg-[#42656cae] rounded-lg flex items-center justify-center gap-[10px] py-[20px] cursor-pointer' onClick={googlelogin}>
-                <img src={google} alt="" className='w-[20px]'/> Login account with Google
+      {/* Auth Card */}
+      <div className="w-full max-w-md bg-slate-900/80 backdrop-blur-2xl border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
+        
+        <div className="text-center">
+          <h2 className="text-xl sm:text-2xl font-black text-white">Sign In to Your Account</h2>
+          <p className="text-xs text-slate-400 mt-1">Access orders, wishlist, and smart recommendations</p>
+        </div>
+
+        {/* Google OAuth Button */}
+        <button
+          onClick={googlelogin}
+          type="button"
+          className="w-full py-3 px-4 bg-slate-950/80 hover:bg-slate-800 border border-slate-700/80 rounded-2xl text-xs sm:text-sm font-semibold text-white flex items-center justify-center gap-3 transition-all hover:scale-102"
+        >
+          <img src={google} alt="Google" className="w-5 h-5 object-contain" />
+          <span>Continue with Google</span>
+        </button>
+
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-slate-800" />
+          <span className="text-[11px] text-slate-500 uppercase font-semibold">Or with email</span>
+          <div className="flex-1 h-px bg-slate-800" />
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">Email Address</label>
+            <div className="relative">
+              <RiMailLine className="absolute left-4 top-3.5 text-slate-400 text-base" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                required
+                className="w-full pl-11 pr-4 py-3 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition-colors"
+              />
             </div>
-            <div className='w-[100%] h-[20px] flex items-center justify-center gap-[10px]'>
-             <div className='w-[40%] h-[1px] bg-[#96969635]'></div> OR <div className='w-[40%] h-[1px] bg-[#96969635]'></div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">Password</label>
+            <div className="relative">
+              <RiLockPasswordLine className="absolute left-4 top-3.5 text-slate-400 text-base" />
+              <input
+                type={show ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                className="w-full pl-11 pr-11 py-3 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShow(!show)}
+                className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white"
+              >
+                {show ? <IoEye className="text-lg" /> : <IoEyeOutline className="text-lg" />}
+              </button>
             </div>
-            <div className='w-[90%] h-[400px] flex flex-col items-center justify-center gap-[15px]  relative'>
-              
-                 <input type="text" className='w-[100%] h-[50px] border-[2px] border-[#96969635] backdrop:blur-sm rounded-lg shadow-lg bg-transparent placeholder-[#ffffffc7] px-[20px] font-semibold' placeholder='Email' required  onChange={(e)=>setEmail(e.target.value)} value={email}/>
-                  <input type={show?"text":"password"} className='w-[100%] h-[50px] border-[2px] border-[#96969635] backdrop:blur-sm rounded-lg shadow-lg bg-transparent placeholder-[#ffffffc7] px-[20px] font-semibold' placeholder='Password' required onChange={(e)=>setPassword(e.target.value)} value={password}/>
-                  {!show && <IoEyeOutline className='w-[20px] h-[20px] cursor-pointer absolute right-[5%] bottom-[57%]' onClick={()=>setShow(prev => !prev)}/>}
-                  {show && <IoEye className='w-[20px] h-[20px] cursor-pointer absolute right-[5%] bottom-[57%]' onClick={()=>setShow(prev => !prev)}/>}
-                  <button className='w-[100%] h-[50px] bg-[#6060f5] rounded-lg flex items-center justify-center mt-[20px] text-[17px] font-semibold'>{loading? <Loading/> : "Login"}</button>
-                  <p className='flex  gap-[10px]'>You haven't any account? <span className='text-[#5555f6cf] text-[17px] font-semibold cursor-pointer' onClick={()=>navigate("/signup")}>Create New Account</span></p>
-            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-2 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-cyan-500/20 transition-all hover:scale-102 active:scale-98 flex items-center justify-center"
+          >
+            {loading ? <Loading /> : "Sign In"}
+          </button>
         </form>
+
+        <p className="text-xs text-slate-400 text-center">
+          Don't have an account?{' '}
+          <span
+            onClick={() => navigate("/signup")}
+            className="text-cyan-400 font-bold hover:underline cursor-pointer"
+          >
+            Create Account
+          </span>
+        </p>
+
+      </div>
     </div>
-    </div>
-  )
+  );
 }
 
-export default Login
+export default Login;

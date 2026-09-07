@@ -1,128 +1,256 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { shopDataContext } from '../context/ShopContext'
-import { FaStar } from "react-icons/fa";
-import { FaStarHalfAlt } from "react-icons/fa";
+import React, { useContext, useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { shopDataContext } from '../context/ShopContext';
+import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { RiShoppingBag3Line, RiShieldCheckLine, RiExchangeFundsLine, RiTruckLine } from 'react-icons/ri';
 import RelatedProduct from '../component/RelatedProduct';
 import Loading from '../component/Loading';
+import { toast } from 'react-toastify';
 
 function ProductDetail() {
-    let {productId} = useParams()
-    let {products,currency ,addtoCart ,loading} = useContext(shopDataContext)
-    let [productData,setProductData] = useState(false)
+  const { productId } = useParams();
+  const navigate = useNavigate();
+  const { products, currency, addtoCart, loading } = useContext(shopDataContext);
+  const [productData, setProductData] = useState(null);
 
-    const [image, setImage] = useState('')
-  const [image1, setImage1] = useState('')
-  const [image2, setImage2] = useState('')
-  const [image3, setImage3] = useState('')
-  const [image4, setImage4] = useState('')
-  const [size, setSize] = useState('')
-
-
-
-   const fetchProductData = async () => {
-    products.map((item) => {
-      if (item._id === productId) {
-        setProductData(item)
-        console.log(productData)
-        setImage1(item.image1)
-        setImage2(item.image2)
-        setImage3(item.image3)
-        setImage4(item.image4)
-        setImage(item.image1)
-
-        return null;
-      }
-
-    })
-  }
+  const [activeImage, setActiveImage] = useState('');
+  const [imagesList, setImagesList] = useState([]);
+  const [size, setSize] = useState('');
+  const [activeTab, setActiveTab] = useState('description');
 
   useEffect(() => {
-    fetchProductData()
-  }, [productId, products])
-  return productData ? (
-    <div >
-        <div className=' w-[99vw] h-[130vh] md:h-[100vh] bg-gradient-to-l from-[#141414] to-[#0c2025] flex items-center justify-start flex-col lg:flex-row gap-[20px]'>
-            <div className='lg:w-[50vw] md:w-[90vw] lg:h-[90vh] h-[50vh] mt-[70px] flex items-center justify-center md:gap-[10px] gap-[30px] flex-col-reverse lg:flex-row'>
-                <div className='lg:w-[20%] md:w-[80%] h-[10%] lg:h-[80%] flex items-center justify-center gap-[50px] lg:gap-[20px] lg:flex-col flex-wrap '>
-                    <div className='md:w-[100px]  w-[50px] h-[50px] md:h-[110px] bg-slate-300 border-[1px] border-[#80808049] rounded-md'>
-                        <img src={image1} alt="" className='w-[100%] h-[100%]  cursor-pointer rounded-md' onClick={()=>setImage(image1)}/>
-                    </div>
-                    <div className='md:w-[100px]  w-[50px] h-[50px] md:h-[110px] bg-slate-300 border-[1px] border-[#80808049] rounded-md'>
-                        <img src={image2} alt="" className='w-[100%] h-[100%]  cursor-pointer rounded-md' onClick={()=>setImage(image2)}/>
-                    </div>
-                    <div className='md:w-[100px]  w-[50px] h-[50px] md:h-[110px] bg-slate-300 border-[1px] border-[#80808049] rounded-md'>
-                        <img src={image3} alt="" className='w-[100%] h-[100%]  cursor-pointer rounded-md' onClick={()=>setImage(image3)}/>
-                    </div>
-                    <div className='md:w-[100px]  w-[50px] h-[50px] md:h-[110px] bg-slate-300 border-[1px] border-[#80808049] rounded-md'>
-                        <img src={image4} alt="" className='w-[100%] h-[100%]  cursor-pointer rounded-md' onClick={()=>setImage(image4)}/>
-                    </div>
+    if (products && products.length > 0) {
+      const found = products.find((item) => item._id === productId);
+      if (found) {
+        setProductData(found);
+        const validImages = [found.image1, found.image2, found.image3, found.image4].filter(Boolean);
+        setImagesList(validImages);
+        setActiveImage(validImages[0] || '');
+        if (found.sizes && found.sizes.length > 0) {
+          setSize(found.sizes[0]);
+        }
+      }
+    }
+  }, [productId, products]);
 
-                </div>
-                <div className='lg:w-[60%] w-[80%] lg:h-[78%] h-[70%] border-[1px] border-[#80808049] rounded-md  overflow-hidden'>
-                    <img src={image} alt="" className=' w-[100%] lg:h-[100%] h-[100%] text-[30px] text-white  text-center rounded-md object-fill ' />
-                </div>
-            </div>
+  if (!productData) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
+        <Loading />
+      </div>
+    );
+  }
 
-            <div className='lg:w-[50vw] w-[100vw] lg:h-[75vh] h-[40vh] lg:mt-[80px] flex items-start justify-start flex-col py-[20px] px-[30px] md:pb-[20px] md:pl-[20px] lg:pl-[0px] lg:px-[0px] lg:py-[0px] gap-[10px]'>
-                <h1 className='text-[40px] font-semibold text-[aliceblue]'>{productData.name.toUpperCase()}</h1>
-                <div className='flex items-center gap-1 '>
-                    <FaStar className='text-[20px] fill-[#FFD700]' />
-                    <FaStar className='text-[20px] fill-[#FFD700]' />
-                    <FaStar className='text-[20px] fill-[#FFD700]' />
-                    <FaStar className='text-[20px] fill-[#FFD700]' />
-                    <FaStarHalfAlt className='text-[20px] fill-[#FFD700]' />
-                    <p className='text-[18px] font-semibold pl-[5px] text-[white]'>(124)</p>
-                </div>
-                <p className='text-[30px] font-semibold pl-[5px] text-[white]'>{currency} {productData.price}</p>
+  const handleAddToCart = () => {
+    if (!size) {
+      toast.warn("Please choose a size before adding to cart");
+      return;
+    }
+    addtoCart(productData._id, size);
+  };
 
-                <p className=' w-[80%] md:w-[60%] text-[20px] font-semibold pl-[5px] text-[white]'>{productData.description} and Stylish, breathable cotton shirt with a modern slim fit. Easy to wash, super comfortable, and designed for effortless style.</p>
-                <div className='flex flex-col gap-[10px] my-[10px] '>
-                    <p className='text-[25px] font-semibold pl-[5px] text-[white]'>Select Size</p>
-          <div className='flex gap-2'>
-            {
-              productData.sizes.map((item, index) => (
-                <button key={index} className={`border py-2 px-4 bg-slate-300 rounded-md 
-                  ${item === size ? 'bg-black text-[#2f97f1] text-[20px]' : ''}`} onClick={() => setSize(item)}  >{item}</button>
-              ))
-            }
-          </div>
-           <button className='text-[16px] active:bg-slate-500 cursor-pointer bg-[#495b61c9] py-[10px] px-[20px] rounded-2xl mt-[10px] border-[1px] border-[#80808049] text-white shadow-md shadow-black' onClick={()=>addtoCart(productData._id , size)} >{loading? <Loading/> : "Add to Cart"}</button>
-                </div>
-            <div className='w-[90%] h-[1px] bg-slate-700'></div>
-            <div className='w-[80%] text-[16px] text-white '>
-
-          <p>100% Original Product.</p>
-          <p>Cash on delivery is available on this product</p>
-          <p>East return and exchange policy within 7 days</p>
-            </div>
-            </div>
-
-
-        </div>
-
-        <div className='w-[100%] min-h-[70vh] bg-gradient-to-l from-[#141414] to-[#0c2025] flex items-start justify-start flex-col  overflow-x-hidden'>
-
-            <div className='flex px-[20px] mt-[90px] lg:ml-[80px] ml-[0px]  lg:mt-[0px]  '>
-
-     <p className='border px-5 py-3 text-sm text-white'>
-       Description
-      </p>
-      <p className='border px-5 py-3 text-sm text-white'>
-       Reviews (124)
-      </p>
-     </div>
-
-     <div className='w-[80%] md:h-[150px] h-[220px] bg-[#3336397c] border text-white text-[13px] md:text-[15px] lg:text-[20px] px-[10px] md:px-[30px] lg:ml-[100px] ml-[20px]'>
-        <p className='w-[95%] h-[90%] flex items-center justify-center '>
-      Upgrade your wardrobe with this stylish slim-fit cotton shirt, available now on OneCart. Crafted from breathable, high-quality fabric, it offers all-day comfort and effortless style. Easy to maintain and perfect for any setting, this shirt is a must-have essential for those who value both fashion and function.</p>
-     </div>
-
-     <RelatedProduct category={productData.category} subCategory={productData.subCategory} currentProductId={productData._id}/>
-        </div>
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 pt-[88px] pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       
+      {/* Product Main Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        
+        {/* Left: Image Gallery (Thumbnails + Main) */}
+        <div className="lg:col-span-7 flex flex-col-reverse sm:flex-row gap-4">
+          
+          {/* Thumbnails */}
+          {imagesList.length > 1 && (
+            <div className="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-y-auto max-h-[500px] shrink-0 no-scrollbar">
+              {imagesList.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImage(img)}
+                  className={`w-16 h-20 sm:w-20 sm:h-24 rounded-2xl overflow-hidden bg-slate-900 border-2 transition-all shrink-0 ${
+                    activeImage === img ? 'border-cyan-400 ring-2 ring-cyan-400/30' : 'border-slate-800 opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Main Large Display Image */}
+          <div className="flex-1 aspect-[4/5] max-h-[580px] rounded-3xl overflow-hidden bg-slate-900/80 border border-slate-800 shadow-2xl relative group">
+            <img
+              src={activeImage}
+              alt={productData.name}
+              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+            />
+            {productData.category && (
+              <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-xs font-bold text-cyan-300 border border-cyan-500/30">
+                {productData.category}
+              </span>
+            )}
+          </div>
+
+        </div>
+
+        {/* Right: Product Meta & Purchase Box */}
+        <div className="lg:col-span-5 space-y-6">
+          
+          {/* Title & Ratings */}
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              {productData.name}
+            </h1>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center text-amber-400 text-sm">
+                <FaStar /><FaStar /><FaStar /><FaStar /><FaStarHalfAlt />
+              </div>
+              <span className="text-xs text-slate-400 font-medium">(148 Verified Reviews)</span>
+            </div>
+          </div>
+
+          {/* Price */}
+          <div className="flex items-baseline gap-3">
+            <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+              {currency}{productData.price}
+            </span>
+            <span className="text-xs text-emerald-400 font-semibold bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-800/50">
+              In Stock & Ready to Ship
+            </span>
+          </div>
+
+          {/* Short Description */}
+          <p className="text-sm text-slate-300 leading-relaxed">
+            {productData.description || "Crafted from breathable, high-grade fabric with precision tailoring for an effortless modern silhouette."}
+          </p>
+
+          {/* Size Selection */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Select Size</span>
+              <span className="text-xs text-cyan-400 cursor-pointer hover:underline">Size Guide</span>
+            </div>
+
+            <div className="flex flex-wrap gap-2.5">
+              {productData.sizes?.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSize(s)}
+                  className={`min-w-[48px] h-11 px-3.5 rounded-xl font-bold text-xs transition-all ${
+                    size === s
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30 ring-2 ring-cyan-400/50'
+                      : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-700/80 hover:border-slate-600'
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <button
+              onClick={handleAddToCart}
+              disabled={loading}
+              className="flex-1 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-cyan-500/20 flex items-center justify-center gap-2 transition-all hover:scale-102 active:scale-98"
+            >
+              {loading ? <Loading /> : (
+                <>
+                  <RiShoppingBag3Line className="text-lg" />
+                  <span>ADD TO CART</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
+                handleAddToCart();
+                navigate('/cart');
+              }}
+              className="px-6 py-4 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-bold text-sm rounded-2xl border border-slate-700 transition-all"
+            >
+              Buy Now
+            </button>
+          </div>
+
+          {/* Guarantees & Perks */}
+          <div className="grid grid-cols-3 gap-2 pt-4 border-t border-slate-800/80 text-center">
+            <div className="p-3 bg-slate-900/50 rounded-2xl border border-slate-800">
+              <RiShieldCheckLine className="text-cyan-400 text-lg mx-auto mb-1" />
+              <p className="text-[10px] text-slate-300 font-semibold">100% Original</p>
+            </div>
+            <div className="p-3 bg-slate-900/50 rounded-2xl border border-slate-800">
+              <RiExchangeFundsLine className="text-purple-400 text-lg mx-auto mb-1" />
+              <p className="text-[10px] text-slate-300 font-semibold">7 Days Return</p>
+            </div>
+            <div className="p-3 bg-slate-900/50 rounded-2xl border border-slate-800">
+              <RiTruckLine className="text-emerald-400 text-lg mx-auto mb-1" />
+              <p className="text-[10px] text-slate-300 font-semibold">Fast Shipping</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Tabs: Description & Reviews */}
+      <div className="mt-16 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8">
+        <div className="flex items-center gap-4 border-b border-slate-800 pb-4">
+          <button
+            onClick={() => setActiveTab('description')}
+            className={`text-sm font-bold tracking-wide transition-colors ${
+              activeTab === 'description' ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Product Description
+          </button>
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`text-sm font-bold tracking-wide transition-colors ${
+              activeTab === 'reviews' ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Verified Reviews (148)
+          </button>
+        </div>
+
+        <div className="mt-6 text-sm text-slate-300 leading-relaxed space-y-3">
+          {activeTab === 'description' ? (
+            <>
+              <p>
+                Upgrade your seasonal wardrobe with the <strong>{productData.name}</strong>, exclusively available on eCart. Crafted from breathable, high-grade cotton blends, it offers all-day comfort and timeless fashion.
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-slate-400">
+                <li>Premium breathable fabric with anti-pilling treatment.</li>
+                <li>Tailored fit with precision stitching along stress points.</li>
+                <li>Machine washable with color-lock technology.</li>
+              </ul>
+            </>
+          ) : (
+            <div className="space-y-4">
+              <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-bold text-white text-xs">Arjun Sharma</span>
+                  <span className="text-[10px] text-slate-500">2 days ago</span>
+                </div>
+                <div className="flex text-amber-400 text-xs mb-1.5"><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></div>
+                <p className="text-xs text-slate-300">Exceptional quality! The fit was spot-on and the fabric feels genuinely luxurious.</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Related Products Carousel */}
+      <div className="mt-16">
+        <RelatedProduct
+          category={productData.category}
+          subCategory={productData.subCategory}
+          currentProductId={productData._id}
+        />
+      </div>
+
     </div>
-  ) :<div className='opacity-0'></div>
+  );
 }
 
-export default ProductDetail
+export default ProductDetail;

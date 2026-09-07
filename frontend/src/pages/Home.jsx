@@ -1,49 +1,53 @@
-import React, { useEffect, useState } from 'react'
-import Backgound from '../component/Backgound'
-import Hero from '../component/Hero'
-import Product from './Product'
-import OurPolicy from '../component/OurPolicy'
-import NewLetterBox from '../component/NewLetterBox'
-import Footer from '../component/Footer'
-
+import React, { useEffect, useState } from 'react';
+import Backgound from '../component/Backgound';
+import Hero from '../component/Hero';
+import Product from './Product';
+import OurPolicy from '../component/OurPolicy';
+import NewLetterBox from '../component/NewLetterBox';
+import Footer from '../component/Footer';
 
 function Home() {
-  let heroData=[
-    {text1:"30% OFF Limited Offer",text2:"Style that"},
-    {text1:"Discover the Best of Bold Fashion",text2:"Limited Time Only!"},
-    {text1:"Explore Our Best Collection ",text2:"Shop Now!"},
-    {text1:"Choose your Perfect Fasion Fit",text2:"Now on Sale!"}
-  ]
+  const heroData = [
+    { text1: "30% OFF Special Drop", text2: "Elevate Your Aesthetic" },
+    { text1: "Bold Designer Fits", text2: "Limited Time Release" },
+    { text1: "Discover Premium Wear", text2: "Handcrafted Luxury" },
+    { text1: "Find Your Signature Style", text2: "Exclusive Seasonal Sale" }
+  ];
 
-  let [heroCount,setHeroCount] = useState(0)
+  const [heroCount, setHeroCount] = useState(0);
 
-  useEffect(()=>{
-    let interval = setInterval(()=>{
-      setHeroCount(prevCount => (prevCount === 3 ? 0 : prevCount + 1));
-    },3000);
-    return () => clearInterval(interval)
-  },[])
-  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroCount((prev) => (prev === 3 ? 0 : prev + 1));
+    }, 4500);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className='overflow-x-hidden relative top-[70px]'>
-    <div className=' w-[100vw] lg:h-[100vh] md:h-[50vh] sm:h-[30vh]   bg-gradient-to-l from-[#141414] to-[#0c2025] '>
+    <div className="min-h-screen bg-slate-950 text-slate-100 pt-[72px] overflow-x-hidden">
+      {/* Hero Banner Container */}
+      <section className="relative w-full h-[75vh] min-h-[500px] max-h-[720px] bg-slate-950 overflow-hidden">
+        <Backgound heroCount={heroCount} />
+        <Hero
+          heroCount={heroCount}
+          setHeroCount={setHeroCount}
+          heroData={heroData[heroCount]}
+        />
+      </section>
 
-      <Backgound heroCount={heroCount}/>
-      <Hero
-      heroCount={heroCount}
-      setHeroCount={setHeroCount}
-      heroData={heroData[heroCount]}
-      />
+      {/* Product Sections */}
+      <Product />
 
+      {/* Value Propositions */}
+      <OurPolicy />
 
-     
+      {/* VIP Newsletter */}
+      <NewLetterBox />
+
+      {/* Footer */}
+      <Footer />
     </div>
-    <Product/>
-    <OurPolicy/>
-    <NewLetterBox/>
-    <Footer/>
-    </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

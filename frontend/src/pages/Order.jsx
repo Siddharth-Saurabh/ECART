@@ -1,84 +1,148 @@
-import React, { useContext, useEffect, useState } from 'react'
-import Title from '../component/Title'
-import { shopDataContext } from '../context/ShopContext'
-import { authDataContext } from '../context/authContext'
-import axios from 'axios'
+import React, { useContext, useEffect, useState } from 'react';
+import Title from '../component/Title';
+import { shopDataContext } from '../context/ShopContext';
+import { authDataContext } from '../context/AuthContext';
+import axios from 'axios';
+import { RiShoppingBag3Line, RiRefreshLine, RiCheckboxCircleLine, RiTruckLine } from 'react-icons/ri';
+import { toast } from 'react-toastify';
 
 function Order() {
-    let [orderData,setOrderData] = useState([])
-    let {currency} = useContext(shopDataContext)
-    let {serverUrl} = useContext(authDataContext)
+  const [orderData, setOrderData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { currency } = useContext(shopDataContext);
+  const { serverUrl } = useContext(authDataContext);
 
-    const loadOrderData = async () => {
-       try {
-      const result = await axios.post(serverUrl + '/api/order/userorder',{},{withCredentials:true})
-      if(result.data){
-        let allOrdersItem = []
-        result.data.map((order)=>{
-          order.items.map((item)=>{
-            item['status'] = order.status
-            item['payment'] = order.payment
-            item['paymentMethod'] = order.paymentMethod
-            item['date'] = order.date
-            allOrdersItem.push(item)
-          })
-        })
-        setOrderData(allOrdersItem.reverse())
+  const loadOrderData = async () => {
+    setLoading(true);
+    try {
+      const result = await axios.post(`${serverUrl}/api/order/userorder`, {}, { withCredentials: true });
+      if (result.data) {
+        const allOrdersItem = [];
+        result.data.forEach((order) => {
+          order.items?.forEach((item) => {
+            allOrdersItem.push({
+              ...item,
+              orderId: order._id,
+              status: order.status || 'Order Placed',
+              payment: order.payment,
+              paymentMethod: order.paymentMethod,
+              date: order.date
+            });
+          });
+        });
+        setOrderData(allOrdersItem.reverse());
       }
     } catch (error) {
-      console.log(error)
+      console.error(error);
+      toast.error("Could not fetch order tracking info");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    loadOrderData();
+  }, []);
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'delivered':
+        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+      case 'shipped':
+      case 'out for delivery':
+        return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30';
+      case 'packing':
+        return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+      default:
+        return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
     }
-
-useEffect(()=>{
- loadOrderData()
-},[])
-
+  };
 
   return (
-    <div className='w-[99vw] min-h-[100vh] p-[20px] pb-[150px]  overflow-hidden bg-gradient-to-l from-[#141414] to-[#0c2025] '>
-      <div className='h-[8%] w-[100%] text-center mt-[80px]'>
-        <Title text1={'MY'} text2={'ORDER'} />
+    <div className="min-h-screen bg-slate-950 text-slate-100 pt-[88px] pb-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+        <div>
+          <Title text1="ORDER" text2="HISTORY & TRACKING" />
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Track your deliveries and view past invoices.
+          </p>
+        </div>
+
+        <button
+          onClick={loadOrderData}
+          disabled={loading}
+          className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold border border-slate-700 flex items-center gap-2 transition-all"
+        >
+          <RiRefreshLine className={`text-base ${loading ? 'animate-spin' : ''}`} />
+          <span>Refresh Tracking</span>
+        </button>
       </div>
-      <div className=' w-[100%] h-[92%] flex flex-wrap gap-[20px]'>
-        {
-         orderData.map((item,index)=>(
-            <div key={index} className='w-[100%] h-[10%] border-t border-b '>
-                <div className='w-[100%] h-[80%] flex items-start gap-6 bg-[#51808048]  py-[10px] px-[20px] rounded-2xl relative '>
-                    <img src={item.image1} alt="" className='w-[130px] h-[130px] rounded-md '/>
-                    <div className='flex items-start justify-center flex-col gap-[5px]'>
-                    <p className='md:text-[25px] text-[20px] text-[#f3f9fc]'>{item.name}</p>
-                    <div className='flex items-center gap-[8px]   md:gap-[20px]'>
-                        <p className='md:text-[18px] text-[12px] text-[#aaf4e7]'>{currency} {item.price}</p>
-                      <p className='md:text-[18px] text-[12px] text-[#aaf4e7]'>Quantity: {item.quantity}</p>
-                      <p className='md:text-[18px] text-[12px] text-[#aaf4e7]'>Size: {item.size}</p>
-                    </div>
-                    <div className='flex items-center'>
-                     <p className='md:text-[18px] text-[12px] text-[#aaf4e7]'>Date: <span className='text-[#e4fbff] pl-[10px] md:text-[16px] text-[11px]'>{new Date(item.date).toDateString()}</span></p>
-                    </div>
-                    <div className='flex items-center'>
-                      <p className='md:text-[16px] text-[12px] text-[#aaf4e7]'>Payment Method :{item.paymentMethod}</p>
-                    </div>
-                    <div className='absolute md:left-[55%] md:top-[40%] right-[2%] top-[2%]  '>
-                        <div className='flex items-center gap-[5px]'>
-                      <p className='min-w-2 h-2 rounded-full bg-green-500'></p> 
-                      <p className='md:text-[17px] text-[10px] text-[#f3f9fc]'>{item.status}</p>
 
-                    </div>
-
-                    </div>
-                     <div className='absolute md:right-[5%] right-[1%] md:top-[40%] top-[70%]'> 
-                    <button className='md:px-[15px] px-[5px] py-[3px] md:py-[7px] rounded-md bg-[#101919] text-[#f3f9fc] text-[12px] md:text-[16px] cursor-pointe active:bg-slate-500' onClick={loadOrderData} >Track Order</button>
+      {orderData.length > 0 ? (
+        <div className="space-y-4">
+          {orderData.map((item, index) => (
+            <div
+              key={index}
+              className="p-5 rounded-2xl bg-slate-900/70 backdrop-blur-md border border-slate-800 hover:border-slate-700 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-5"
+            >
+              {/* Product Info */}
+              <div className="flex items-center gap-4">
+                <img
+                  src={item.image1}
+                  alt={item.name}
+                  className="w-20 h-24 sm:w-24 sm:h-28 object-cover rounded-xl bg-slate-950 border border-slate-800"
+                />
+                <div className="space-y-1.5">
+                  <h4 className="text-base font-bold text-white line-clamp-1">{item.name}</h4>
+                  <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-400">
+                    <span className="font-bold text-cyan-400 text-sm">{currency}{item.price}</span>
+                    <span>•</span>
+                    <span>Qty: <strong className="text-white">{item.quantity}</strong></span>
+                    <span>•</span>
+                    <span>Size: <strong className="text-white">{item.size}</strong></span>
                   </div>
-                    </div>
+                  <p className="text-[11px] text-slate-500">
+                    Ordered on: {new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                  <p className="text-[11px] text-slate-400">
+                    Payment: <span className="text-slate-300 uppercase font-semibold">{item.paymentMethod}</span> ({item.payment ? "Paid" : "Pending"})
+                  </p>
                 </div>
-               
+              </div>
+
+              {/* Status & Action */}
+              <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800">
+                <div className={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-1.5 ${getStatusColor(item.status)}`}>
+                  <span className="w-2 h-2 rounded-full bg-current animate-pulse"></span>
+                  <span>{item.status}</span>
+                </div>
+
+                <button
+                  onClick={loadOrderData}
+                  className="px-4 py-2 bg-slate-950 hover:bg-slate-800 text-cyan-400 hover:text-cyan-300 rounded-xl text-xs font-bold border border-cyan-500/30 flex items-center gap-1.5 transition-all"
+                >
+                  <RiTruckLine className="text-sm" />
+                  <span>Track Status</span>
+                </button>
+              </div>
+
             </div>
-         ))
-        }
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="py-24 text-center bg-slate-900/30 rounded-3xl border border-slate-800 p-8 max-w-lg mx-auto">
+          <div className="w-16 h-16 rounded-full bg-cyan-500/10 text-cyan-400 flex items-center justify-center mx-auto mb-4 border border-cyan-500/20">
+            <RiShoppingBag3Line className="text-3xl" />
+          </div>
+          <h3 className="text-lg font-bold text-white mb-1">No Orders Found</h3>
+          <p className="text-xs sm:text-sm text-slate-400 mb-6">Looks like you haven't placed an order yet.</p>
+        </div>
+      )}
+
     </div>
-  )
+  );
 }
 
-export default Order
+export default Order;
